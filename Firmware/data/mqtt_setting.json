@@ -9,7 +9,7 @@
       "value": "label+input,label+select{position:sticky;left:120px;width:230px!important;box-sizing:border-box;}"
     },
     {
-      "name": "header",
+      "name": "header1",
       "type": "ACText",
       "value": "<h2>System Settings</h2>",
       "style": "text-align:center;color:#2f4f4f;"
@@ -36,22 +36,93 @@
     {
       "name": "gatewayID",
       "type": "ACInput",
-      "value": "",
+      "value": "12345",
       "label": "Gateway ID"
     },
     {
       "name": "nodeID",
       "type": "ACInput",
-      "value": "",
+      "value": "67890",
       "label": "Node ID"
     },
     {
-      "name": "newline",
+      "name": "newline99",
       "type": "ACElement",
       "value": "<hr>"
     },
     {
-      "name": "header",
+      "name": "header5",
+      "type": "ACText",
+      "value": "<h4>Network Status</h4>",
+      "style": "text-align:center;color:#2f4f4f;"
+    },
+    {
+      "name": "network",
+      "type": "ACText",
+      "value": "4G",
+      "style": "font-family:serif;color:#4682b4;"
+    },
+    {
+      "name": "provider",
+      "type": "ACText",
+      "value": "Vodafone",
+      "style": "font-family:serif;color:#4682b4;"
+    },
+    {
+      "name": "signal",
+      "type": "ACText",
+      "value": "-80 dBm",
+      "style": "font-family:serif;color:#4682b4;"
+    },
+    {
+      "name": "refresh2",
+      "type": "ACButton",
+      "value": "Refresh",
+      "action": "refreshP()",
+      "posterior": "none"
+    },
+    {
+      "name": "newline98",
+      "type": "ACElement",
+      "value": "<hr>"
+    },
+    {
+      "name": "header6",
+      "type": "ACText",
+      "value": "<h4>Battery</h4>",
+      "style": "text-align:center;color:#2f4f4f;"
+    },
+    {
+      "name": "voltage",
+      "type": "ACText",
+      "value": "4.2V",
+      "style": "font-family:serif;color:#4682b4;"
+    },
+    {
+      "name": "capacity",
+      "type": "ACText",
+      "value": "80%",
+      "style": "font-family:serif;color:#4682b4;"
+    },
+    {
+      "name": "refresh1",
+      "type": "ACButton",
+      "value": "Refresh",
+      "action": "refreshP()",
+      "posterior": "none"
+    },
+    {
+      "name": "js",
+      "type": "ACElement",
+      "value": "<script type='text/javascript'>function refreshP() {document.location.reload(true);}</script>"
+    },
+    {
+      "name": "newline0",
+      "type": "ACElement",
+      "value": "<hr>"
+    },
+    {
+      "name": "header2",
       "type": "ACText",
       "value": "<h4>System Settings</h4>",
       "style": "text-align:center;color:#2f4f4f;"
@@ -69,19 +140,19 @@
       "label": "APN"
     },
     {
-      "name": "newline",
+      "name": "newline2",
       "type": "ACElement",
       "value": "<hr>"
     },
     {
-      "name": "header",
+      "name": "header3",
       "type": "ACText",
       "value": "<h4>Sensors Settings</h4>",
       "style": "text-align:center;color:#2f4f4f;"
     },
 
     {
-      "name": "caption",
+      "name": "caption3",
       "type": "ACText",
       "value": "Sensor 1 Settings",
       "style": "font-family:serif;color:#4682b4;"
@@ -90,7 +161,7 @@
     {
       "name": "period1",
       "type": "ACRadio",
-      "label": "<h2>Sensor 1</h2>",
+      "label": "<h3>Sensor 1</h3>",
       "value": [
         "Enable",
         "Disable"
@@ -112,7 +183,7 @@
     },
 
     {
-      "name": "caption",
+      "name": "caption4",
       "type": "ACText",
       "value": "Sensor 2 Settings",
       "style": "font-family:serif;color:#4682b4;"
@@ -120,7 +191,7 @@
     {
       "name": "period2",
       "type": "ACRadio",
-      "label": "<h2>Sensor 2</h2>",
+      "label": "<h3>Sensor 2</h3>",
       "value": [
         "Enable",
         "Disable"
@@ -142,7 +213,7 @@
     },
 
     {
-      "name": "caption",
+      "name": "caption5",
       "type": "ACText",
       "value": "Sensor 3 Settings",
       "style": "font-family:serif;color:#4682b4;"
@@ -150,7 +221,7 @@
     {
       "name": "period3",
       "type": "ACRadio",
-      "label": "<h2>Sensor 3</h2>",
+      "label": "<h3>Sensor 3</h3>",
       "value": [
         "Enable",
         "Disable"
@@ -172,7 +243,7 @@
     },
 
     {
-      "name": "caption",
+      "name": "caption6",
       "type": "ACText",
       "value": "Sensor 4 Settings",
       "style": "font-family:serif;color:#4682b4;"
@@ -180,7 +251,7 @@
     {
       "name": "period4",
       "type": "ACRadio",
-      "label": "<h2>Sensor 4</h2>",
+      "label": "<h3>Sensor 4</h3>",
       "value": [
         "Enable",
         "Disable"
@@ -200,15 +271,14 @@
       "value": "1",
       "label": "Multiplier"
     },
-
-
-
-
     {
-      "name": "newline",
+      "name": "newline3",
       "type": "ACElement",
       "value": "<hr>"
     },
+
+
+
     {
       "name": "hostname",
       "type": "ACInput",

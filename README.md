@@ -111,6 +111,9 @@ ESP32 DevKit standard pinout
 5.  The default access IP Address is ```http://192.168.4.1/_ac```
 6.  You will be presented with a main dashboard as shown below(based on your device)
    ![SCR1](Circuit/scr1.png)
+7.  You can open settings page with following default credentials
+    1.  User: **AP Name (SmartADC)**
+    2.  Password: **admin**
 
 
 ## List of Components <a name = "list"></a>

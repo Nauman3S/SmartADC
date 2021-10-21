@@ -8,12 +8,23 @@ String loadParams(AutoConnectAux &aux, PageArgument &args) //function to load sa
 {
     (void)(args);
     File param = FlashFS.open(PARAM_FILE, "r");
-    String v1 = "";
-    String v2 = "";
+
     if (param)
     {
         Serial.println("load params func");
         aux.loadElement(param);
+        Serial.println(param);
+        AutoConnectText &networkElm = aux["network"].as<AutoConnectText>();
+        AutoConnectText &providerElm = aux["provider"].as<AutoConnectText>();
+        AutoConnectText &signalElm = aux["signal"].as<AutoConnectText>();
+        AutoConnectText &voltageElm = aux["signal"].as<AutoConnectText>();
+        AutoConnectText &capacityElm = aux["capacity"].as<AutoConnectText>();
+
+        networkElm.value = String("Network: ") + network;
+        providerElm.value = String("Provider: ") + provider;
+        signalElm.value = String("Signal: ") + signal;
+        voltageElm.value = String("Voltage: ") + voltage;
+        capacityElm.value = String("Capacity: ") + capacity;
 
         // curSValueElm.value="CurS:7788";
         param.close();
@@ -79,8 +90,6 @@ String saveParams(AutoConnectAux &aux, PageArgument &args) //save the settings
     mulS4 = args.arg("mulS4");
     mulS4.trim();
 
-    
-
     // The entered value is owned by AutoConnectAux of /mqtt_setting.
     // To retrieve the elements of /mqtt_setting, it is necessary to get
     // the AutoConnectAux object of /mqtt_setting.
@@ -122,12 +131,34 @@ uint8_t inAP = 0;
 bool whileCP()
 {
 
+    //use this function as a main loop
+    loopGPRS();
+    
+    if (isMQTTConnected())
+    {
+        String topicP=gatewayID+String("/")+nodeID;
+        provider=getProvider();
+        doc["ts"] = String("1234");
+
+        doc["values"][0]["temperautre"] = getTemp();
+        doc["values"][0]["humidity"] = getHumid();
+        doc["values"][0]["batt"] = String(getADC(5));
+        doc["values"][0]["custom1"] = String(getADC(1,mulS1));
+        doc["values"][0]["custom2"] = String(getADC(2,mulS2));
+        doc["values"][0]["custom3"] = String(getADC(3,mulS3));
+        doc["values"][0]["custom4"] = String(getADC(4,mulS4));
+        doc["values"][0]["network"] = String(getADC(4,mulS4));
+        doc["values"][0]["signal"] =getSignalStrength();
+
+        serializeJson(doc, jsonDoc);
+        mqtt.publish(topicP.c_str(), jsonDoc);
+    }
+
     if (inAP == 0)
     {
         ledState(AP_MODE);
         inAP = 1;
     }
-    // Serial.println("AP MODE");
 
     loopLEDHandler();
 }
@@ -135,7 +166,9 @@ bool whileCP()
 void setup() //main setup functions
 {
     Serial.begin(115200);
-    setupCommsHandler();
+    setupGPRS();
+
+    setupDHT22();
     delay(1000);
     sendData_UVCommander("Message \"Welcome!\"");
 
@@ -170,7 +203,7 @@ void setup() //main setup functions
         AutoConnectInput &settingsPassElm = mqtt_setting["settingsPass"].as<AutoConnectInput>();
         AutoConnectInput &ntpAddElm = mqtt_setting["ntpAdd"].as<AutoConnectInput>();
         AutoConnectInput &apnElm = mqtt_setting["apn"].as<AutoConnectInput>();
-        
+
         AutoConnectInput &nameS1Elm = mqtt_setting["nameS1"].as<AutoConnectInput>();
         AutoConnectInput &nameS2Elm = mqtt_setting["nameS2"].as<AutoConnectInput>();
         AutoConnectInput &nameS3Elm = mqtt_setting["nameS3"].as<AutoConnectInput>();
@@ -185,6 +218,13 @@ void setup() //main setup functions
         AutoConnectRadio &sensorEnabled2Elm = mqtt_setting["period2"].as<AutoConnectRadio>();
         AutoConnectRadio &sensorEnabled3Elm = mqtt_setting["period3"].as<AutoConnectRadio>();
         AutoConnectRadio &sensorEnabled4Elm = mqtt_setting["period4"].as<AutoConnectRadio>();
+
+        AutoConnectText &networkElm = mqtt_setting["network"].as<AutoConnectText>();
+        AutoConnectText &providerElm = mqtt_setting["provider"].as<AutoConnectText>();
+        AutoConnectText &signalElm = mqtt_setting["signal"].as<AutoConnectText>();
+
+        AutoConnectText &voltageElm = mqtt_setting["voltage"].as<AutoConnectText>();
+        AutoConnectText &capacityElm = mqtt_setting["capacity"].as<AutoConnectText>();
         //vibSValueElm.value="VibS:11";
         serverName = String(serverNameElm.value);
         port = String(portElm.value);
@@ -196,20 +236,20 @@ void setup() //main setup functions
         ntpAdd = String(ntpAddElm.value);
         apn = String(apnElm.value);
 
-        nameS1=String(nameS1Elm.value);
-        nameS2=String(nameS2Elm.value);
-        nameS3=String(nameS3Elm.value);
-        nameS4=String(nameS4Elm.value);
+        nameS1 = String(nameS1Elm.value);
+        nameS2 = String(nameS2Elm.value);
+        nameS3 = String(nameS3Elm.value);
+        nameS4 = String(nameS4Elm.value);
 
-        mulS1=String(mulS1Elm.value);
-        mulS2=String(mulS2Elm.value);
-        mulS3=String(mulS3Elm.value);
-        mulS4=String(mulS4Elm.value);
+        mulS1 = String(mulS1Elm.value);
+        mulS2 = String(mulS2Elm.value);
+        mulS3 = String(mulS3Elm.value);
+        mulS4 = String(mulS4Elm.value);
 
-        sensorEnabled1=String(sensorEnabled1Elm.value());
-        sensorEnabled2=String(sensorEnabled2Elm.value());
-        sensorEnabled3=String(sensorEnabled3Elm.value());
-        sensorEnabled4=String(sensorEnabled4Elm.value());
+        sensorEnabled1 = String(sensorEnabled1Elm.value());
+        sensorEnabled2 = String(sensorEnabled2Elm.value());
+        sensorEnabled3 = String(sensorEnabled3Elm.value());
+        sensorEnabled4 = String(sensorEnabled4Elm.value());
 
         if (hostnameElm.value.length())
         {
@@ -257,7 +297,6 @@ void setup() //main setup functions
 
     //add different tabs on homepage
 
-    //  portal.disableMenu(AC_MENUITEM_DISCONNECT);
     server.on("/", handleRoot);
     // Starts user web site included the AutoConnect portal.
 
@@ -270,6 +309,10 @@ void setup() //main setup functions
     portal.whileCaptivePortal(whileCP);
     portal.onDetect(atDetect);
     portal.load(FPSTR(PAGE_AUTH));
+
+    portal.disableMenu(AC_MENUITEM_DISCONNECT);
+    portal.disableMenu(AC_MENUITEM_OPENSSIDS);
+    portal.disableMenu(AC_MENUITEM_CONFIGNEW);
     if (portal.begin())
     {
         Serial.println("Started, IP:" + WiFi.localIP().toString());
@@ -289,44 +332,20 @@ void setup() //main setup functions
     mqttConnect(); //start mqtt
 
     Serial.println("Checking if device exisits.");
-    mqttPublish("tanning-device/deviceExists", ss.getMacAddress());
+    mqttPublish("smart-adc-device/deviceExists", ss.getMacAddress());
 }
 
 void loop()
 {
+    //don't edit this function
+    //use whileCP function above as a main loop
     server.handleClient();
 
     portal.handleRequest();
-    UVCommanderPollHandler();
+
     if (millis() - lastPub > updateInterval) //publish data to mqtt server
     {
-        mqttPublish("smart-adc-device/" + String(hostName), String("Data")); //publish data to mqtt broker
         ledState(ACTIVE_MODE);
-        Serial.println("Sending data");
-        //uncomment the lines below for debugging
-        // Serial.println(ampSensorType);
-        // Serial.println(sensorSelection);
-        // Serial.println(minActiveValue);
-        // Serial.println(channelId);
-        // Serial.println(userKey);
-        // Serial.println(apiKey);
-        // Serial.println(apid);
-        // Serial.println(hostName);
-        // Serial.println(apPass);
-        // Serial.println(tempUnits)
-
         lastPub = millis();
-    }
-    if (!mqttClient.connected())
-    {
-        reconnect();
-    }
-    mqttClient.loop();
-    if (WiFi.status() == WL_IDLE_STATUS)
-    {
-        ledState(IDLE_MODE);
-        ESP.restart();
-
-        delay(1000);
     }
 }

@@ -7,21 +7,21 @@
     "label": "Server"
   },
   {
-    "name": "channelid",
+    "name": "port",
     "type": "ACInput",
-    "value": "454951",
-    "label": "Channel ID"
+    "value": "1883",
+    "label": "MQTT Port"
   },
   {
-    "name": "userkey",
+    "name": "gatewayID",
     "type": "ACInput",
-    "value": "NRTFYGJ6TJFGX4RC",
-    "label": "User Key"
+    "value": "12345",
+    "label": "Gateway ID"
   },
   {
-    "name": "apikey",
+    "name": "nodeID",
     "type": "ACInput",
-    "value": "HBVQ2XV6VYBI4582",
-    "label": "API Key"
+    "value": "67890",
+    "label": "Node ID"
   }
 ]

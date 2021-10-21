@@ -20,7 +20,27 @@ String mulS1;
 String mulS2;
 String mulS3;
 String mulS4;
+String network="4G";
+String provider="Vodafone";
+String signal="-83 dBm";
+String voltage="4.2V";
+String capacity="80%";
 
+DynamicJsonDocument doc(1024);
+char jsonDoc[1024];
+
+
+String getBroker(){
+  return serverName;
+}
+
+int getPort(){
+  return port.toInt();
+}
+
+String getAPN(){
+  return apn;
+}
 
 #if defined(ARDUINO_ARCH_ESP8266)
 #include <ESP8266WiFi.h>
@@ -38,7 +58,7 @@ ESP8266WebServer server;
 WebServer server;
 #endif
 #include <ESPmDNS.h>
-#include <PubSubClient.h>
+
 #include "SoftwareStack.h"
 #ifndef BUILTIN_LED
 #define BUILTIN_LED 2 // backward compatibility
@@ -54,8 +74,12 @@ FS &FlashFS = LittleFS;
 #include <SPIFFS.h>
 fs::SPIFFSFS &FlashFS = SPIFFS;
 #endif
+#include <ArduinoJson.h>
 #include "statusLED.h"
 #include "neoTimer.h"
+#include "dhtHandler.h"
+#include "adcHandler.h"
+#include "gprs.h"
 
 #define GET_CHIPID() ((uint16_t)(ESP.getEfuseMac() >> 32))
 
@@ -92,18 +116,6 @@ String loggedIn = "";
 String mac = (WiFi.macAddress());
 char __mac[sizeof(mac)];
 
-const char *mqtt_server = "broker.hivemq.com";
-IPAddress mqttBroker(34,214,65,82);
-const int mqtt_port = 1883;
-const char *mqtt_user = "testUser";
-const char *mqtt_pass = "testUser@123";
-const char *mqtt_client_name = __mac; //"12312312312332212";// any random alphanumeric stirng
-//////////////////////////////
-#define BUFFER_SIZE 250
-String incoming = "";
-String incomingTopic = "";
-WiFiClient wclient;
-PubSubClient mqttClient(wclient);
 
 String devList[10];
 String IMEIsList[10];
