@@ -58,12 +58,7 @@ const char wifiPass[] = "YourWiFiPass";
 // MQTT details
 const char *broker = "broker.hivemq.com";
 
-const char *topicRelay = "SmartWaterMonitor/relay";
-const char *topicInit = "SmartWaterMonitor/init";
-const char *topicPressureSensorStatus = "SmartWaterMonitor/pressure";
-const char *topicPressureSensorLive = "swm-device/SmartWaterMonitor/pressure";
-const char *topicPressureRelayLive = "swm-device/SmartWaterMonitor/relayState";
-const char *topicPressureEventChange = "swm-device/SmartWaterMonitor/eventPressureLimitChanged";
+
 
 #include <TinyGsmClient.h>
 #include <PubSubClient.h>
@@ -110,21 +105,7 @@ void mqttCallback(char *topic, byte *payload, unsigned int len)
         payloadV = payloadV + String(payload[i]);
     }
 
-    // Only proceed if incoming message's topic matches
-    if (String(topic) == topicRelay)
-    {
-        ledStatus = !ledStatus;
-        digitalWrite(LED_PIN, ledStatus);
-        if (payloadV.indexOf(String("ON")) >= 0)
-        {
-            digitalWrite(RELAY_PIN, 1);
-        }
-        else
-        {
-            digitalWrite(RELAY_PIN, 0);
-        }
-        //mqtt.publish(topicPressureSensorStatus, ledStatus ? "1" : "0");
-    }
+
 }
 
 boolean mqttConnect()
@@ -144,8 +125,8 @@ boolean mqttConnect()
         return false;
     }
     SerialMon.println(" success");
-    mqtt.publish(topicInit, "GsmClientTest started");
-    mqtt.subscribe(topicRelay);
+    // mqtt.publish(topicInit, "GsmClientTest started");
+    // mqtt.subscribe(topicRelay);
     return mqtt.connected();
 }
 void publishData(String topic, String data)
@@ -217,7 +198,7 @@ void setupGPRS()
     if (!modem.waitForNetwork())
     {
         SerialMon.println(" fail");
-        delay(10000);
+        delay(6000);
         return;
     }
     SerialMon.println(" success");
@@ -234,7 +215,7 @@ void setupGPRS()
     if (!modem.gprsConnect(getAPN().c_str(), gprsUser, gprsPass))
     {
         SerialMon.println(" fail");
-        delay(10000);
+        delay(6000);
         return;
     }
     SerialMon.println(" success");
@@ -270,12 +251,13 @@ void loopGPRS()
                 lastReconnectAttempt = 0;
             }
         }
-        delay(100);
+      //  delay(100);
         return;
     }
     else{
         mqttConnected=1;
+        mqtt.loop();
     }
 
-    mqtt.loop();
+    
 }

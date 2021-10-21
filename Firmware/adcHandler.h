@@ -33,9 +33,9 @@ float getADC(uint8_t adcNumber, String multiplierV = "1.0")
         v = v * mul;
         return v;
     }
-    else if (adcNumber == 5)
+    else if (adcNumber == BATT_ADC)
     { //battery
-        v = analogRead(ADC5);
+        v = analogRead(BATT_ADC);
         v = v * mul;
         return v;
     }

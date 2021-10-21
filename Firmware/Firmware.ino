@@ -1,9 +1,10 @@
-#include "headers.h"   //all misc. headers and functions
-#include "MQTTFuncs.h" //MQTT related functions
-#include "webApp.h"    //Captive Portal webpages
-#include <FS.h>        //ESP32 File System
-#include "commHandler.h"
+#include "headers.h" //all misc. headers and functions
+#include "webApp.h"  //Captive Portal webpages
+#include <FS.h>      //ESP32 File System
 IPAddress ipV(192, 168, 4, 1);
+
+TaskHandle_t Task1;
+
 String loadParams(AutoConnectAux &aux, PageArgument &args) //function to load saved settings
 {
     (void)(args);
@@ -127,32 +128,56 @@ bool loadAux(const String auxName) //load defaults from data/*.json
         Serial.println("Filesystem open failed: " + fn);
     return rc;
 }
+
+void Task1Loop(void *pvParameters) //GPRS
+{
+    Serial.print("Task1 running on core ");
+    Serial.println(xPortGetCoreID());
+    setupGPRS();
+
+    for (;;)
+    {
+        loopGPRS();
+        capacity=String(getADC(5));
+        if (isMQTTConnected())
+        {
+            String topicP = gatewayID + String("/") + nodeID;
+            provider = getProvider();
+            doc["ts"] = String("1234");
+
+            doc["values"][0]["temperautre"] = getTemp("C");
+            doc["values"][0]["humidity"] = getHumid();
+            doc["values"][0]["batt"] = String(getADC(5));
+            if (sensorEnabled1.indexOf(enableC) >= 0)
+            {
+                doc["values"][0]["custom1"] = String(getADC(1, mulS1));
+            }
+            if (sensorEnabled2.indexOf(enableC) >= 0)
+            {
+                doc["values"][0]["custom2"] = String(getADC(2, mulS2));
+            }
+            if (sensorEnabled3.indexOf(enableC) >= 0)
+            {
+                doc["values"][0]["custom3"] = String(getADC(3, mulS3));
+            }
+            if (sensorEnabled4.indexOf(enableC) >= 0)
+            {
+                doc["values"][0]["custom4"] = String(getADC(4, mulS4));
+            }
+            doc["values"][0]["network"] = String(network);
+            doc["values"][0]["signal"] = getSignalStrength();
+
+            serializeJson(doc, jsonDoc);
+            mqtt.publish(topicP.c_str(), jsonDoc);
+        }
+    }
+}
+
 uint8_t inAP = 0;
 bool whileCP()
 {
 
     //use this function as a main loop
-    loopGPRS();
-    
-    if (isMQTTConnected())
-    {
-        String topicP=gatewayID+String("/")+nodeID;
-        provider=getProvider();
-        doc["ts"] = String("1234");
-
-        doc["values"][0]["temperautre"] = getTemp();
-        doc["values"][0]["humidity"] = getHumid();
-        doc["values"][0]["batt"] = String(getADC(5));
-        doc["values"][0]["custom1"] = String(getADC(1,mulS1));
-        doc["values"][0]["custom2"] = String(getADC(2,mulS2));
-        doc["values"][0]["custom3"] = String(getADC(3,mulS3));
-        doc["values"][0]["custom4"] = String(getADC(4,mulS4));
-        doc["values"][0]["network"] = String(getADC(4,mulS4));
-        doc["values"][0]["signal"] =getSignalStrength();
-
-        serializeJson(doc, jsonDoc);
-        mqtt.publish(topicP.c_str(), jsonDoc);
-    }
 
     if (inAP == 0)
     {
@@ -166,11 +191,19 @@ bool whileCP()
 void setup() //main setup functions
 {
     Serial.begin(115200);
-    setupGPRS();
+
+    xTaskCreatePinnedToCore(
+        Task1Loop, /* Task function. */
+        "Task1",   /* name of task. */
+        10000,     /* Stack size of task */
+        NULL,      /* parameter of the task */
+        1,         /* priority of the task */
+        &Task1,    /* Task handle to keep track of created task */
+        1);        /* pin task to core 1 */
+    delay(500);
 
     setupDHT22();
     delay(1000);
-    sendData_UVCommander("Message \"Welcome!\"");
 
     if (!MDNS.begin("esp32")) //starting mdns so that user can access webpage using url `esp32.local`(will not work on all devices)
     {
@@ -330,9 +363,6 @@ void setup() //main setup functions
 
     MDNS.addService("http", "tcp", 80);
     mqttConnect(); //start mqtt
-
-    Serial.println("Checking if device exisits.");
-    mqttPublish("smart-adc-device/deviceExists", ss.getMacAddress());
 }
 
 void loop()

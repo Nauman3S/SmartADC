@@ -95,9 +95,9 @@ You should have Arduino IDE Installed
 ### ESP32 Dev Module Pinout
 
 
-ESP32 DevKit standard pinout
+ESP32 SIM700 Pinout
 
-![Pinout](Circuit/ESP32-Pinout.jpg)
+``![Pinout](Circuit/ESP32-Pinout.jpg)``
 
 
 

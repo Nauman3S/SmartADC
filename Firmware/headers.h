@@ -25,9 +25,8 @@ String provider="Vodafone";
 String signal="-83 dBm";
 String voltage="4.2V";
 String capacity="80%";
+String enableC="Ena";
 
-DynamicJsonDocument doc(1024);
-char jsonDoc[1024];
 
 
 String getBroker(){
@@ -74,12 +73,19 @@ FS &FlashFS = LittleFS;
 #include <SPIFFS.h>
 fs::SPIFFSFS &FlashFS = SPIFFS;
 #endif
-#include <ArduinoJson.h>
+
 #include "statusLED.h"
 #include "neoTimer.h"
 #include "dhtHandler.h"
 #include "adcHandler.h"
 #include "gprs.h"
+
+
+
+#include <ArduinoJson.h>
+
+DynamicJsonDocument doc(1024);
+char jsonDoc[1024];
 
 #define GET_CHIPID() ((uint16_t)(ESP.getEfuseMac() >> 32))
 
