@@ -92,12 +92,12 @@ You should have Arduino IDE Installed
 ## Circuit <a name = "circuit"></a>
 
 
-### ESP32 Dev Module Pinout
+### ESP32 SIM7000
 
 
 ESP32 SIM700 Pinout
 
-``![Pinout](Circuit/ESP32-Pinout.jpg)``
+![Pinout](Circuit/esp32.png)
 
 
 
@@ -109,9 +109,7 @@ ESP32 SIM700 Pinout
 3.  Default captive portal password `123456789AP` which can be changed in captive portal.
 4.  Connect to the ESP32 access point and open the web-browser and navigate to the link ```http://esp32.local/_ac```. This link will work on most of the operating systems but if your operating system is not allowing to open it, you may want to check the captive portal IP Address from the serial monitor and can use that IP address inplace of the above mentioned URL.
 5.  The default access IP Address is ```http://192.168.4.1/_ac```
-6.  You will be presented with a main dashboard as shown below(based on your device)
-   ![SCR1](Circuit/scr1.png)
-7.  You can open settings page with following default credentials
+6.  You can open settings page with following default credentials
     1.  User: **AP Name (SmartADC)**
     2.  Password: **admin**
 
