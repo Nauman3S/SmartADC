@@ -1,6 +1,6 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=200px height=200px src="Artwork/smartTanningDevice.png" alt="Project logo"></a>
+ <img width=200px height=200px src="Artwork/smartADC.png" alt="Project logo"></a>
 </p>
 
 <h3 align="center">Smart ADC Device</h3>
@@ -95,7 +95,7 @@ You should have Arduino IDE Installed
 ### ESP32 Dev Module Pinout
 
 
-Follow the pinout diagram given below to connect different components to your TTGO LORA32 board.
+ESP32 DevKit standard pinout
 
 ![Pinout](Circuit/ESP32-Pinout.jpg)
 
