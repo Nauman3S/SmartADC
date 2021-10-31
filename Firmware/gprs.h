@@ -6,7 +6,9 @@
 // #define TINY_GSM_MODEM_SIM868
 // #define TINY_GSM_MODEM_SIM900
 
-#define TINY_GSM_MODEM_SIM7000
+//#define TINY_GSM_MODEM_SIM7000
+#define TINY_GSM_MODEM_SIM7600
+#define TINY_GSM_RX_BUFFER 1024 // Set RX buffer to 1Kb
 
 // #define TINY_GSM_MODEM_SIM5360
 // #define TINY_GSM_MODEM_SIM7600
@@ -58,8 +60,6 @@ const char wifiPass[] = "YourWiFiPass";
 // MQTT details
 const char *broker = "broker.hivemq.com";
 
-
-
 #include <TinyGsmClient.h>
 #include <PubSubClient.h>
 
@@ -104,8 +104,6 @@ void mqttCallback(char *topic, byte *payload, unsigned int len)
     {
         payloadV = payloadV + String(payload[i]);
     }
-
-
 }
 
 boolean mqttConnect()
@@ -133,11 +131,13 @@ void publishData(String topic, String data)
 {
     mqtt.publish(topic.c_str(), data.c_str());
 }
-String getProvider(){
-    String s=String(modem.getOperator());
+String getProvider()
+{
+    String s = String(modem.getOperator());
 }
-String getSignalStrength(){
-    String s=String(modem.getSignalQuality());
+String getSignalStrength()
+{
+    String s = String(modem.getSignalQuality());
 }
 void setupGPRS()
 {
@@ -150,7 +150,11 @@ void setupGPRS()
     // !!!!!!!!!!!
     // Set your reset, enable, power pins here
     // !!!!!!!!!!!
+    pinMode(MODEM_PWRKEY, OUTPUT);
 
+    digitalWrite(MODEM_PWRKEY, HIGH);
+    delay(300);
+    digitalWrite(MODEM_PWRKEY, LOW);
     SerialMon.println("Wait...");
 
     // Set GSM module baud rate
@@ -230,16 +234,18 @@ void setupGPRS()
     mqtt.setServer(getBroker().c_str(), getPort());
     mqtt.setCallback(mqttCallback);
 }
-int mqttConnected=0;
-int isMQTTConnected(){
+int mqttConnected = 0;
+int isMQTTConnected()
+{
     return mqtt.connected();
 }
 void loopGPRS()
 {
+    //modem.maintain();
 
     if (!mqtt.connected())
     {
-        mqttConnected=0;
+        mqttConnected = 0;
         SerialMon.println("=== MQTT NOT CONNECTED ===");
         // Reconnect every 10 seconds
         uint32_t t = millis();
@@ -251,13 +257,12 @@ void loopGPRS()
                 lastReconnectAttempt = 0;
             }
         }
-      //  delay(100);
+        //  delay(100);
         return;
     }
-    else{
-        mqttConnected=1;
+    else
+    {
+        mqttConnected = 1;
         mqtt.loop();
     }
-
-    
 }

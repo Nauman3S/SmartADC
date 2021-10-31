@@ -7,6 +7,7 @@
 #define MODEM_POWER_ON       23
 #define MODEM_TX             27
 #define MODEM_RX             26
+#define PIN_DTR     25
 
 
 
